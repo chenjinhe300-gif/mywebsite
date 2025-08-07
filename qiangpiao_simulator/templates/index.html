@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>简易抢票模拟器</title>
+    <style>
+        body {
+            font-family: "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #c0392b;
+        }
+
+        p#result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #2c3e50;
+            background-color: #ecf0f1;
+            padding: 10px 20px;
+            border-radius: 5px;
+            min-height: 40px;
+        }
+
+        /* 动效样式 */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); background-color: #27ae60; }
+            100% { transform: scale(1); background-color: #e74c3c; }
+        }
+
+        button.success-animate {
+            animation: pop 0.5s ease;
+        }
+    </style>
+    <script>
+        function qiangpiao() {
+            const username = document.getElementById("username").value.trim();
+            if (!username) {
+                alert("请输入你的名字！");
+                return;
+            }
+
+            fetch("/qiang", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name: username })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const message = data.message;
+                document.getElementById("result").innerText = message;
+
+                // 如果抢票成功，播放音效和动画
+                if (message.includes("抢到票")) {
+                    document.getElementById("successSound").play();
+
+                    const button = document.querySelector("button");
+                    button.classList.add("success-animate");
+
+                    // 动画结束后移除 class，确保下次可以重新触发
+                    setTimeout(() => {
+                        button.classList.remove("success-animate");
+                    }, 600);
+                }
+            })
+            .catch(error => {
+                document.getElementById("result").innerText = "发生错误：" + error;
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>🎫 抢票模拟器</h1>
+    <input type="text" id="username" placeholder="请输入你的名字">
+    <button onclick="qiangpiao()">立即抢票</button>
+    <p id="result">← 抢票结果将在这里显示</p>
+
+    <!-- 成功音效 -->
+    <audio id="successSound" src="https://www.soundjay.com/button/sounds/button-4.mp3" preload="auto"></audio>
+</body>
+</html>

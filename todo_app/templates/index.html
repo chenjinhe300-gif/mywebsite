@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>待办事项清单</title>
+</head>
+<body>
+    <h1>我的待办事项</h1>
+    <form action="{{ url_for('add') }}" method="post">
+        <input type="text" name="task" placeholder="输入新任务">
+        <button type="submit">添加</button>
+    </form>
+    <ul>
+        {% for task in todos %}
+    <li>
+        {{ task }}
+        <a href="{{ url_for('delete', task_id=loop.index0) }}">删除</a>
+    </li>
+{% endfor %}
+    </ul>
+</body>
+</html>
